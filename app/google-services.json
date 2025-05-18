@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "298441495116",
+    "project_id": "ginger-7929d",
+    "storage_bucket": "ginger-7929d.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:298441495116:android:0dcc804ef370a7489e1ae9",
+        "android_client_info": {
+          "package_name": "com.example.ginger"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDdt-0GJLmp-P6wB6XiY2kwcKkrv7zeZgo"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

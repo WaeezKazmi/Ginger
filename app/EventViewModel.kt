@@ -1,15 +1,33 @@
-package com.example.collegealert
+package com.example.ginger
 
-import androidx.compose.runtime.mutableStateListOf
 import androidx.lifecycle.ViewModel
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 
 class EventViewModel : ViewModel() {
-    private val _events = mutableStateListOf(*sampleEvents.toTypedArray())
-    val events: List<Event> get() = _events
 
-    fun addEvent(event: Event) {
-        _events.add(event)
+    private val repository = EventRepository()
+    private val _events = MutableStateFlow<List<Event>>(emptyList())
+    val events: StateFlow<List<Event>> = _events
+
+    init {
+        repository.listenEvents { _events.value = it }
     }
 
-    fun getEventById(id: Int): Event? = _events.find { it.id == id }
+    fun addEvent(event: Event) {
+        repository.addEvent(event, {}, { it.printStackTrace() })
+    }
+
+    fun getEventById(id: String, onResult: (Event?) -> Unit) {
+        repository.getEventById(id, onResult)
+    }
+
+    fun deleteEvent(eventId: String) {
+        repository.deleteEvent(eventId, {}, { it.printStackTrace() })
+    }
+
+    override fun onCleared() {
+        super.onCleared()
+        repository.removeListener()
+    }
 }

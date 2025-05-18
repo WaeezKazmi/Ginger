@@ -1,11 +1,14 @@
-package com.example.collegealert
+package com.example.ginger
 
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.navigation.compose.rememberNavController
-import com.example.collegealert.ui.Screens
+import com.example.ginger.ui.Screens
+
+import com.example.ginger.Event
+
 
 
 class MainActivity : ComponentActivity() {

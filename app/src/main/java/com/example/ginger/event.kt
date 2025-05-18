@@ -1,8 +1,10 @@
-package com.example.collegealert
+package com.example.ginger
+
+import java.util.Date
 
 data class Event(
-    val id: Int,
-    val title: String,
-    val description: String,
-    val date: String
+    var id: String? = null,
+    val title: String = "",
+    val description: String = "",
+    val date: Date? = null
 )

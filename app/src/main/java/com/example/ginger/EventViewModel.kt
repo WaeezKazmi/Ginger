@@ -1,22 +1,48 @@
-package com.example.collegealert
+package com.example.ginger
 
-import androidx.compose.runtime.mutableStateListOf
 import androidx.lifecycle.ViewModel
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 
 class EventViewModel : ViewModel() {
-    // List to store events
-    val events = mutableStateListOf<Event>(
-        Event(1, "Cultural Festival", "A festival celebrating culture.", "2025-05-20"),
-        Event(2, "Tech Conference", "A conference for tech enthusiasts.", "2025-06-15")
-    )
 
-    // Method to get event by ID
-    fun getEventById(id: Int): Event? {
-        return events.find { it.id == id }
+    private val repository = EventRepository()
+
+    private val _events = MutableStateFlow<List<Event>>(emptyList())
+    val events: StateFlow<List<Event>> = _events
+
+    init {
+        repository.listenEvents { newEvents ->
+            _events.value = newEvents
+        }
     }
 
-    // Method to add a new event
     fun addEvent(event: Event) {
-        events.add(event)
+        repository.addEvent(event,
+            onSuccess = { /* optional: show success message */ },
+            onFailure = { e -> e.printStackTrace() }
+        )
+    }
+
+    fun getEventById(id: String, onResult: (Event?) -> Unit) {
+        repository.getEventById(id, onResult)
+    }
+
+    fun deleteEvent(eventId: String, onFailure: Function<Unit>, onSuccess: () -> Unit) {
+        repository.deleteEvent(eventId,
+            onSuccess = {
+                // Refresh event list or handle UI update if needed
+                // In this setup, listener will auto-update _events, so no need to do anything else
+            },
+            onFailure = { e ->
+                e.printStackTrace()
+                // Optional: Show error message to user
+            }
+        )
+    }
+
+    override fun onCleared() {
+        super.onCleared()
+        repository.removeListener()
     }
 }
