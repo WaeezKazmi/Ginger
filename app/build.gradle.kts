@@ -2,6 +2,10 @@ plugins {
     id("com.android.application")
     id("org.jetbrains.kotlin.android")
     id("org.jetbrains.kotlin.plugin.compose") // Add Compose plugin
+    id  ("kotlin-kapt")
+}
+kapt {
+    correctErrorTypes = true
 }
 
 android {
@@ -10,7 +14,7 @@ android {
 
     defaultConfig {
         applicationId = "com.example.collegealert"
-        minSdk = 24
+        minSdk = 26
         targetSdk = 34
         versionCode = 1
         versionName = "1.0"
@@ -75,4 +79,11 @@ dependencies {
     androidTestImplementation("androidx.compose.ui:ui-test-junit4:1.7.4")
     debugImplementation("androidx.compose.ui:ui-tooling:1.7.4")
     debugImplementation("androidx.compose.ui:ui-test-manifest:1.7.4")
+    implementation ("androidx.compose.material3:material3:1.2.0")
+    implementation ("androidx.compose.material3:material3-window-size-class:1.2.0")
+    implementation ("androidx.compose.material:material-icons-extended:1.6.0")
+    implementation("androidx.room:room-runtime:2.6.1")
+    kapt("androidx.room:room-compiler:2.6.1")
+    implementation("androidx.room:room-ktx:2.6.1")
+
 }
