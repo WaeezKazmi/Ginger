@@ -1,0 +1,30 @@
+{
+  "project_info": {
+    "project_number": "459827997208",
+    "firebase_url": "https://ginger-92b85-default-rtdb.firebaseio.com",
+    "project_id": "ginger-92b85",
+    "storage_bucket": "ginger-92b85.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:459827997208:android:3dd9ef0d20cc613cda316d",
+        "android_client_info": {
+          "package_name": "com.example.collegealert"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCAIeD1ljMgN5ULOnG8cBuEGWBMFt01ecM"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
