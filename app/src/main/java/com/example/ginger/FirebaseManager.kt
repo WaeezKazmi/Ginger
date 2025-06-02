@@ -3,8 +3,8 @@ package com.example.ginger
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.PendingIntent
-import android.content.Context
 import android.content.Intent
+import android.content.Context
 import android.net.Uri
 import android.os.Build
 import android.util.Log
@@ -43,9 +43,9 @@ class FirebaseManager {
             return false
         }
         return try {
-            database.child("shared_events").push().setValue(event).await()
-            Log.d(TAG, "Event pushed to Firebase")
-            // Removed showNotification call to prevent creator notification
+            val eventRef = database.child("shared_events").push()
+            eventRef.setValue(event).await()
+            Log.d(TAG, "Event pushed to Firebase with key: ${eventRef.key}, imageUrl: ${event.imageUrl}")
             true
         } catch (e: Exception) {
             Log.e(TAG, "Error pushing event: ${e.message}", e)
@@ -73,7 +73,6 @@ class FirebaseManager {
                         val key = data.key
                         if (event != null && event.creatorId != userId && key != null) {
                             onEventReceived(event, key)
-                            // Send notification to other users
                             sendNotification(event, userId, context)
                         }
                     }
@@ -134,7 +133,7 @@ class FirebaseManager {
 
     private fun sendNotification(event: Event, userId: String, context: Context) {
         if (event.creatorId == userId) {
-            Log.d(TAG, "Skipping notification for creator: ${event.creatorId}")
+            Log.d(TAG, "Skipping notification for creator: ${event.id}")
             return
         }
 

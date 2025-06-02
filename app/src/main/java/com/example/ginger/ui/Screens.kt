@@ -364,6 +364,7 @@ object Screens {
         var selectedDepartment by remember { mutableStateOf("") }
         var selectedPosition by remember { mutableStateOf("") }
         var imageUri by remember { mutableStateOf<Uri?>(null) }
+        var isUploading by remember { mutableStateOf(false) } // Track upload state
         val snackbarHostState = remember { SnackbarHostState() }
         val coroutineScope = rememberCoroutineScope()
         val context = LocalContext.current
@@ -429,9 +430,8 @@ object Screens {
                     .fillMaxSize()
                     .verticalScroll(rememberScrollState())
             ) {
-                // User info fields
+                // User info fields (unchanged)
                 if (userType == UserType.FACULTY) {
-                    // Faculty-specific fields
                     OutlinedTextField(
                         value = name,
                         onValueChange = { name = it },
@@ -441,10 +441,8 @@ object Screens {
                     )
                     Spacer(modifier = Modifier.height(8.dp))
 
-                    // Department selection
                     var expanded by remember { mutableStateOf(false) }
                     val departments = listOf("Computer Science", "Mathematics", "Physics", "Chemistry", "Biology", "Engineering")
-
                     ExposedDropdownMenuBox(
                         expanded = expanded,
                         onExpandedChange = { expanded = !expanded }
@@ -477,13 +475,10 @@ object Screens {
                             }
                         }
                     }
-
                     Spacer(modifier = Modifier.height(8.dp))
 
-                    // Faculty position/rank
                     var positionExpanded by remember { mutableStateOf(false) }
                     val positions = listOf("Professor", "Associate Professor", "Assistant Professor", "Lecturer")
-
                     ExposedDropdownMenuBox(
                         expanded = positionExpanded,
                         onExpandedChange = { positionExpanded = !positionExpanded }
@@ -516,7 +511,6 @@ object Screens {
                             }
                         }
                     }
-
                     Spacer(modifier = Modifier.height(8.dp))
 
                     OutlinedTextField(
@@ -527,7 +521,6 @@ object Screens {
                         singleLine = true,
                         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
                     )
-
                     Spacer(modifier = Modifier.height(8.dp))
 
                     OutlinedTextField(
@@ -538,7 +531,6 @@ object Screens {
                         singleLine = true
                     )
                 } else {
-                    // Student fields
                     OutlinedTextField(
                         value = name,
                         onValueChange = { name = it },
@@ -639,16 +631,20 @@ object Screens {
                 Button(
                     onClick = {
                         if (validateInputs(userType, name, id, title, description, date, designation, selectedDepartment, selectedPosition)) {
+                            isUploading = true
                             coroutineScope.launch {
                                 val uniqueKey = firebaseManager.generateUniqueKey()
                                 if (uniqueKey != null) {
+                                    // Upload image if selected
                                     val imageUrl = imageUri?.let { uri ->
                                         val uploadedUrl = firebaseManager.uploadImage(uri, context)
-                                        if (uploadedUrl == null && userType == UserType.STUDENT) {
+                                        if (uploadedUrl == null) {
                                             snackbarHostState.showSnackbar("Failed to upload image")
                                         }
-                                        uploadedUrl ?: ""
+                                        uploadedUrl
                                     } ?: ""
+
+                                    // Create event
                                     val event = Event(
                                         id = uniqueKey.hashCode(),
                                         title = title,
@@ -667,17 +663,22 @@ object Screens {
                                         onSuccess = {
                                             coroutineScope.launch {
                                                 snackbarHostState.showSnackbar("Event added successfully")
+                                                isUploading = false
+                                                navController.popBackStack()
                                             }
                                         },
                                         onError = { errorMessage ->
                                             coroutineScope.launch {
                                                 snackbarHostState.showSnackbar(errorMessage)
+                                                isUploading = false
                                             }
                                         }
                                     )
-                                    navController.popBackStack()
                                 } else {
-                                    snackbarHostState.showSnackbar("Failed to generate unique event ID")
+                                    coroutineScope.launch {
+                                        snackbarHostState.showSnackbar("Failed to generate unique event ID")
+                                        isUploading = false
+                                    }
                                 }
                             }
                         } else {
@@ -687,14 +688,20 @@ object Screens {
                         }
                     },
                     modifier = Modifier.fillMaxWidth(),
-                    enabled = validateInputs(userType, name, id, title, description, date, designation, selectedDepartment, selectedPosition)
+                    enabled = !isUploading && validateInputs(userType, name, id, title, description, date, designation, selectedDepartment, selectedPosition)
                 ) {
-                    Text("Submit")
+                    if (isUploading) {
+                        CircularProgressIndicator(
+                            modifier = Modifier.size(24.dp),
+                            color = MaterialTheme.colorScheme.onPrimary
+                        )
+                    } else {
+                        Text("Submit")
+                    }
                 }
             }
         }
     }
-
     fun validateInputs(
         userType: UserType,
         name: String,
